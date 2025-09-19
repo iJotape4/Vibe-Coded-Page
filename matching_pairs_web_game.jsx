@@ -1,0 +1,380 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+/**
+ * Matching Pairs Web Game (React, TailwindCSS)
+ * -------------------------------------------------
+ * How to customize pairs:
+ *  - Click "Edit Data" and paste your JSON using the schema below.
+ *  - Your data is saved to localStorage between sessions.
+ *  - Press "Reset & Shuffle" to start a fresh game.
+ *
+ * JSON Schema (array of pairs):
+ * [
+ *   {
+ *     "id": "unique-pair-id",
+ *     "label": "Text to show on the cards",
+ *     // Optional fields:
+ *     "image": "https://example.com/image.png",   // If provided, card shows image instead of text
+ *     "bg": "#1f2937"                              // Optional background (hex or any CSS color)
+ *   }
+ * ]
+ *
+ * Notes:
+ * - Each object represents ONE pair. The game duplicates them into two cards.
+ * - If you include an "image", the card displays that image (and hides label by default).
+ * - If you include both image and label, a small caption (label) appears under the image.
+ */
+
+// --- Mock data you can replace later ---
+const DEFAULT_PAIRS = [
+  { id: "p1", label: "Apple", bg: "#fde68a" },
+  { id: "p2", label: "Banana", bg: "#fef3c7" },
+  { id: "p3", label: "Cherry", bg: "#fecaca" },
+  { id: "p4", label: "Grape", bg: "#e9d5ff" },
+  { id: "p5", label: "Lemon", bg: "#fef08a" },
+  { id: "p6", label: "Mango", bg: "#ffedd5" },
+];
+
+// --- Utilities ---
+function shuffle(array) {
+  const a = array.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function safeParse(jsonStr) {
+  try {
+    const data = JSON.parse(jsonStr);
+    if (!Array.isArray(data)) throw new Error("Root must be an array of pairs");
+    return { ok: true, data };
+  } catch (e) {
+    return { ok: false, error: e.message };
+  }
+}
+
+function useTimer(isRunning) {
+  const [elapsed, setElapsed] = useState(0);
+  const startRef = useRef(null);
+
+  useEffect(() => {
+    let rafId;
+    if (isRunning) {
+      if (startRef.current == null) startRef.current = performance.now();
+      const tick = () => {
+        setElapsed((performance.now() - startRef.current) / 1000);
+        rafId = requestAnimationFrame(tick);
+      };
+      rafId = requestAnimationFrame(tick);
+    }
+    return () => cancelAnimationFrame(rafId);
+  }, [isRunning]);
+
+  const reset = () => {
+    startRef.current = performance.now();
+    setElapsed(0);
+  };
+
+  return { elapsed, reset };
+}
+
+export default function MatchingPairsGame() {
+  // JSON editor state
+  const [jsonText, setJsonText] = useState(
+    () => localStorage.getItem("pairs-json") || JSON.stringify(DEFAULT_PAIRS, null, 2)
+  );
+  const parsed = useMemo(() => safeParse(jsonText), [jsonText]);
+
+  // Build a deck from the parsed pairs
+  const buildDeck = (pairs) => {
+    const cards = [];
+    pairs.forEach((p, idx) => {
+      const pairId = p.id ?? `pair-${idx}`;
+      const base = { pairId, label: p.label ?? `Item ${idx + 1}`, image: p.image, bg: p.bg };
+      cards.push({ ...base, uid: `${pairId}-a`, state: "faceDown" });
+      cards.push({ ...base, uid: `${pairId}-b`, state: "faceDown" });
+    });
+    return shuffle(cards);
+  };
+
+  const [deck, setDeck] = useState(() => buildDeck(parsed.ok ? parsed.data : DEFAULT_PAIRS));
+  const [first, setFirst] = useState(null);
+  const [second, setSecond] = useState(null);
+  const [lock, setLock] = useState(false);
+  const [moves, setMoves] = useState(0);
+  const [matches, setMatches] = useState(0);
+
+  const allMatched = matches > 0 && matches * 2 === deck.length;
+  const isRunning = deck.some((c) => c.state !== "matched");
+  const { elapsed, reset: resetTimer } = useTimer(isRunning);
+
+  // Persist JSON changes
+  useEffect(() => {
+    localStorage.setItem("pairs-json", jsonText);
+  }, [jsonText]);
+
+  // Reset game when JSON changes (and is valid)
+  useEffect(() => {
+    if (parsed.ok) {
+      setDeck(buildDeck(parsed.data));
+      setFirst(null);
+      setSecond(null);
+      setLock(false);
+      setMoves(0);
+      setMatches(0);
+      resetTimer();
+    }
+  }, [parsed.ok, jsonText]);
+
+  // Handle card selection
+  const onFlip = (uid) => {
+    if (lock) return;
+    const card = deck.find((c) => c.uid === uid);
+    if (!card || card.state !== "faceDown") return;
+
+    const nextDeck = deck.map((c) => (c.uid === uid ? { ...c, state: "faceUp" } : c));
+    setDeck(nextDeck);
+
+    if (!first) {
+      setFirst({ ...card, state: "faceUp" });
+      return;
+    }
+
+    if (first.uid === uid) return; // same card safeguard
+
+    setSecond({ ...card, state: "faceUp" });
+    setLock(true);
+    setMoves((m) => m + 1);
+
+    // Evaluate after a short delay for UX
+    setTimeout(() => {
+      setDeck((curr) => {
+        const a = curr.find((c) => c.uid === first.uid);
+        const b = curr.find((c) => c.uid === uid);
+        if (!a || !b) return curr;
+        if (a.pairId === b.pairId) {
+          setMatches((mm) => mm + 1);
+          return curr.map((c) =>
+            c.uid === a.uid || c.uid === b.uid ? { ...c, state: "matched" } : c
+          );
+        } else {
+          return curr.map((c) =>
+            c.uid === a.uid || c.uid === b.uid ? { ...c, state: "faceDown" } : c
+          );
+        }
+      });
+      setFirst(null);
+      setSecond(null);
+      setLock(false);
+    }, 650);
+  };
+
+  const resetGame = () => {
+    if (!parsed.ok) return;
+    setDeck(buildDeck(parsed.data));
+    setFirst(null);
+    setSecond(null);
+    setLock(false);
+    setMoves(0);
+    setMatches(0);
+    resetTimer();
+  };
+
+  const copyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(jsonText);
+    } catch (e) {
+      console.warn("Clipboard failed:", e);
+    }
+  };
+
+  // Keyboard support: use arrows to move focus, Enter/Space to flip
+  const gridRef = useRef(null);
+
+  const cardSizeClass = useMemo(() => {
+    const n = deck.length;
+    if (n <= 8) return "grid-cols-4";
+    if (n <= 12) return "grid-cols-4";
+    if (n <= 16) return "grid-cols-4";
+    if (n <= 20) return "grid-cols-5";
+    return "grid-cols-6";
+  }, [deck.length]);
+
+  return (
+    <div className="min-h-screen bg-neutral-100 text-neutral-900">
+      {/* Header */}
+      <header className="mx-auto max-w-6xl px-4 pt-8 pb-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <h1 className="text-2xl font-bold tracking-tight">Matching Pairs</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={resetGame}
+              className="rounded-2xl border border-neutral-300 px-4 py-2 text-sm shadow-sm hover:bg-white active:scale-[.98]"
+              title="Reset & Shuffle"
+            >
+              Reset & Shuffle
+            </button>
+            <button
+              onClick={copyJson}
+              className="rounded-2xl border border-neutral-300 px-4 py-2 text-sm shadow-sm hover:bg-white active:scale-[.98]"
+              title="Copy JSON to clipboard"
+            >
+              Copy JSON
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+          <div className="rounded-xl bg-white p-3 shadow-sm">
+            <div className="font-semibold">Moves</div>
+            <div className="text-2xl tabular-nums">{moves}</div>
+          </div>
+          <div className="rounded-xl bg-white p-3 shadow-sm">
+            <div className="font-semibold">Matches</div>
+            <div className="text-2xl tabular-nums">{matches} / {deck.length / 2}</div>
+          </div>
+          <div className="rounded-xl bg-white p-3 shadow-sm">
+            <div className="font-semibold">Time</div>
+            <div className="text-2xl tabular-nums">{elapsed.toFixed(1)}s</div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 pb-12 md:grid-cols-3">
+        {/* Game board */}
+        <section className="md:col-span-2">
+          <div
+            className={`grid ${cardSizeClass} gap-3`} ref={gridRef}
+            role="grid" aria-label="Game board"
+          >
+            {deck.map((card, idx) => (
+              <Card
+                key={card.uid}
+                card={card}
+                index={idx}
+                onFlip={onFlip}
+              />
+            ))}
+          </div>
+          {allMatched && (
+            <div className="mt-6 rounded-xl bg-emerald-50 p-4 text-emerald-900 shadow-sm">
+              <div className="text-lg font-semibold">🎉 You matched them all!</div>
+              <div className="text-sm">Moves: {moves} · Time: {elapsed.toFixed(1)}s</div>
+            </div>
+          )}
+        </section>
+
+        {/* JSON editor */}
+        <aside className="md:col-span-1">
+          <div className="sticky top-4 rounded-xl bg-white p-4 shadow-sm">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-base font-semibold">Edit Data (JSON)</h2>
+              <span className={`text-xs ${parsed.ok ? "text-emerald-600" : "text-red-600"}`}>
+                {parsed.ok ? "Valid" : `Invalid: ${parsed.error}`}
+              </span>
+            </div>
+            <textarea
+              value={jsonText}
+              onChange={(e) => setJsonText(e.target.value)}
+              className="h-72 w-full resize-y rounded-lg border border-neutral-300 bg-neutral-50 p-2 font-mono text-xs outline-none focus:ring-2 focus:ring-neutral-300"
+              spellCheck={false}
+              aria-label="Pairs JSON editor"
+            />
+            <div className="mt-3 space-y-2 text-xs text-neutral-600">
+              <p>
+                Tip: Provide an array of pairs. Each pair becomes two cards. You can add
+                <code className="mx-1 rounded bg-neutral-100 px-1">image</code> and
+                <code className="mx-1 rounded bg-neutral-100 px-1">bg</code>.
+              </p>
+              <details>
+                <summary className="cursor-pointer select-none font-medium">Minimal example</summary>
+                <pre className="mt-2 overflow-auto rounded-lg bg-neutral-100 p-2">{`[
+  { "id": "p1", "label": "Dog" },
+  { "id": "p2", "label": "Cat" }
+]`}</pre>
+              </details>
+              <details>
+                <summary className="cursor-pointer select-none font-medium">With images</summary>
+                <pre className="mt-2 overflow-auto rounded-lg bg-neutral-100 p-2">{`[
+  { "id": "p1", "label": "Apple", "image": "https://picsum.photos/seed/apple/200" },
+  { "id": "p2", "label": "Banana", "image": "https://picsum.photos/seed/banana/200" }
+]`}</pre>
+              </details>
+              <button
+                onClick={resetGame}
+                className="mt-2 w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-50"
+              >
+                Reset & Shuffle
+              </button>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer className="mx-auto max-w-6xl px-4 pb-10 text-center text-xs text-neutral-500">
+        Built with React + Tailwind. Paste your own JSON, and press Reset.
+      </footer>
+    </div>
+  );
+}
+
+function Card({ card, onFlip, index }) {
+  const isUp = card.state === "faceUp" || card.state === "matched";
+  const isMatched = card.state === "matched";
+
+  return (
+    <button
+      onClick={() => onFlip(card.uid)}
+      disabled={isMatched}
+      className={`relative aspect-square w-full select-none rounded-2xl border border-neutral-300 shadow-sm transition-transform active:scale-[.98] ${
+        isMatched ? "opacity-70" : ""
+      }`}
+      aria-label={`Card ${index + 1}`}
+      aria-pressed={isUp}
+      style={{
+        perspective: "1000px",
+        background: isUp ? (card.bg || "#ffffff") : "#f3f4f6",
+      }}
+    >
+      <div
+        className={`absolute inset-0 flex h-full w-full items-center justify-center p-3 transition-all duration-300 ${
+          isUp ? "rotate-0" : "rotate-y-180"
+        }`}
+        style={{ transformStyle: "preserve-3d" }}
+      >
+        {/* Front (face-up) */}
+        <div
+          className={`absolute inset-0 flex items-center justify-center backface-hidden p-2 ${
+            isUp ? "opacity-100" : "opacity-0"
+          }`}
+          style={{ transform: "rotateY(0deg)" }}
+        >
+          {card.image ? (
+            <figure className="flex flex-col items-center gap-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={card.image} alt={card.label || "Pair image"} className="max-h-24 w-auto rounded-lg object-contain" />
+              {card.label && (
+                <figcaption className="text-xs font-medium text-neutral-800">{card.label}</figcaption>
+              )}
+            </figure>
+          ) : (
+            <span className="text-lg font-semibold text-neutral-900">{card.label}</span>
+          )}
+        </div>
+
+        {/* Back (face-down) */}
+        <div
+          className={`absolute inset-0 flex items-center justify-center rounded-2xl bg-neutral-200 backface-hidden ${
+            isUp ? "opacity-0" : "opacity-100"
+          }`}
+          style={{ transform: "rotateY(180deg)" }}
+        >
+          <span className="text-2xl">❓</span>
+        </div>
+      </div>
+    </button>
+  );
+}
