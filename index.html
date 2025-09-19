@@ -1,763 +1,341 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wanderlust Adventures | Travel Agency</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Global Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --primary: #2a6b9c;
-            --secondary: #34c6d3;
-            --accent: #ff6b6b;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
-        
-        html {
-            scroll-behavior: smooth;
-        }
-        
-        body {
-            line-height: 1.6;
-            color: #333;
-            background-color: #fff;
-        }
-        
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 12px 28px;
-            background-color: var(--accent);
-            color: white;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-        }
-        
-        .btn:hover {
-            background-color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .section-title {
-            text-align: center;
-            margin-bottom: 50px;
-            font-size: 2.5rem;
-            color: var(--primary);
-        }
-        
-        .section-title span {
-            color: var(--accent);
-        }
-        
-        section {
-            padding: 80px 0;
-        }
-        
-        /* Header Styles */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background-color: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 15px 0;
-            transition: all 0.3s ease;
-        }
-        
-        header.sticky {
-            padding: 10px 0;
-        }
-        
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .logo {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .logo span {
-            color: var(--accent);
-        }
-        
-        .nav-links {
-            display: flex;
-            list-style: none;
-        }
-        
-        .nav-links li {
-            margin-left: 30px;
-        }
-        
-        .nav-links a {
-            text-decoration: none;
-            color: var(--dark);
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        
-        .nav-links a:hover {
-            color: var(--accent);
-        }
-        
-        .menu-toggle {
-            display: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
-            display: flex;
-            align-items: center;
-            color: white;
-            text-align: center;
-        }
-        
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        .hero-content h1 {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
-            animation: fadeInDown 1s ease;
-        }
-        
-        .hero-content p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            animation: fadeInUp 1s ease;
-        }
-        
-        /* Destinations Section */
-        .destinations {
-            background-color: var(--light);
-        }
-        
-        .destination-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .destination-card {
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .destination-card:hover {
-            transform: translateY(-10px);
-        }
-        
-        .card-img {
-            height: 200px;
-            overflow: hidden;
-        }
-        
-        .card-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .destination-card:hover .card-img img {
-            transform: scale(1.1);
-        }
-        
-        .card-content {
-            padding: 20px;
-        }
-        
-        .card-content h3 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-        
-        .card-content p {
-            margin-bottom: 15px;
-            color: #666;
-        }
-        
-        .price {
-            color: var(--accent);
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-        
-        /* Services Section */
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 30px;
-        }
-        
-        .service-card {
-            text-align: center;
-            padding: 30px;
-            border-radius: 10px;
-            background-color: white;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .service-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .service-icon {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-        
-        .service-card h3 {
-            margin-bottom: 15px;
-            color: var(--dark);
-        }
-        
-        /* Testimonials Section */
-        .testimonials {
-            background-color: var(--light);
-        }
-        
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-        
-        .testimonial-card {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-        
-        .testimonial-text {
-            font-style: italic;
-            margin-bottom: 20px;
-            color: #555;
-        }
-        
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-        }
-        
-        .author-img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            overflow: hidden;
-            margin-right: 15px;
-        }
-        
-        .author-img img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .author-info h4 {
-            color: var(--primary);
-            margin-bottom: 5px;
-        }
-        
-        /* Newsletter Section */
-        .newsletter {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80') no-repeat center center/cover;
-            color: white;
-            text-align: center;
-        }
-        
-        .newsletter h2 {
-            margin-bottom: 20px;
-        }
-        
-        .newsletter p {
-            max-width: 600px;
-            margin: 0 auto 30px;
-        }
-        
-        .newsletter-form {
-            display: flex;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-        
-        .newsletter-form input {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            border-radius: 50px 0 0 50px;
-            outline: none;
-        }
-        
-        .newsletter-form button {
-            padding: 0 30px;
-            border-radius: 0 50px 50px 0;
-            border: none;
-            background-color: var(--accent);
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 60px 0 30px;
-        }
-        
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .footer-column h3 {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--secondary);
-        }
-        
-        .footer-links {
-            list-style: none;
-        }
-        
-        .footer-links li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-links a {
-            color: #ccc;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-        
-        .footer-links a:hover {
-            color: var(--accent);
-        }
-        
-        .social-links {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        
-        .social-links a:hover {
-            background-color: var(--accent);
-            transform: translateY(-3px);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Animations */
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .hero-content h1 {
-                font-size: 2.8rem;
-            }
-            
-            .section-title {
-                font-size: 2.2rem;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-            
-            .nav-links {
-                position: fixed;
-                top: 70px;
-                left: -100%;
-                width: 100%;
-                height: calc(100vh - 70px);
-                background-color: white;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.5s ease;
-            }
-            
-            .nav-links.active {
-                left: 0;
-            }
-            
-            .nav-links li {
-                margin: 15px 0;
-            }
-            
-            .hero-content h1 {
-                font-size: 2.5rem;
-            }
-            
-            .newsletter-form {
-                flex-direction: column;
-            }
-            
-            .newsletter-form input {
-                border-radius: 50px;
-                margin-bottom: 10px;
-            }
-            
-            .newsletter-form button {
-                border-radius: 50px;
-                padding: 15px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            .hero-content h1 {
-                font-size: 2rem;
-            }
-            
-            .section-title {
-                font-size: 1.8rem;
-            }
-            
-            .btn {
-                padding: 10px 20px;
-            }
-        }
-    </style>
-</head>
-<body>
-    <!-- Header -->
-    <header id="header">
-        <div class="container navbar">
-            <a href="#" class="logo">Wanderlust<span>Adventures</span></a>
-            <div class="menu-toggle" id="menuToggle">
-                <i class="fas fa-bars"></i>
-            </div>
-            <ul class="nav-links" id="navLinks">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#destinations">Destinations</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#testimonials">Testimonials</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </div>
-    </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Matching Pairs</title>
+    <!-- TailwindCSS (Play CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="color-scheme" content="light" />
+  </head>
+  <body class="min-h-screen bg-neutral-100">
+    <div id="root"></div>
 
-    <!-- Hero Section -->
-    <section class="hero" id="home">
-        <div class="container hero-content">
-            <h1>Discover the World's Beauty</h1>
-            <p>Experience unforgettable journeys with our expert travel planners. Your dream vacation is just a click away.</p>
-            <a href="#destinations" class="btn">Explore Destinations</a>
-        </div>
-    </section>
+    <!-- React 18 + ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 
-    <!-- Destinations Section -->
-    <section class="destinations" id="destinations">
-        <div class="container">
-            <h2 class="section-title">Popular <span>Destinations</span></h2>
-            <div class="destination-grid">
-                <div class="destination-card">
-                    <div class="card-img">
-                        <img src="https://images.unsplash.com/photo-1537996194471-e657df975ab4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Bali, Indonesia">
-                    </div>
-                    <div class="card-content">
-                        <h3>Bali, Indonesia</h3>
-                        <p>Experience the perfect blend of culture, beaches, and nightlife in the Island of Gods.</p>
-                        <p class="price">From $899</p>
-                        <a href="#" class="btn">View Details</a>
-                    </div>
-                </div>
-                
-                <div class="destination-card">
-                    <div class="card-img">
-                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Santorini, Greece">
-                    </div>
-                    <div class="card-content">
-                        <h3>Santorini, Greece</h3>
-                        <p>White-washed buildings and blue domes overlooking the stunning Aegean Sea.</p>
-                        <p class="price">From $1,199</p>
-                        <a href="#" class="btn">View Details</a>
-                    </div>
-                </div>
-                
-                <div class="destination-card">
-                    <div class="card-img">
-                        <img src="https://images.unsplash.com/photo-1513326738677-b964603b136d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Kyoto, Japan">
-                    </div>
-                    <div class="card-content">
-                        <h3>Kyoto, Japan</h3>
-                        <p>Discover ancient temples, traditional gardens, and rich cultural heritage.</p>
-                        <p class="price">From $1,299</p>
-                        <a href="#" class="btn">View Details</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- Babel (to run JSX directly in the browser). For production, consider bundling. -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Services Section -->
-    <section class="services" id="services">
-        <div class="container">
-            <h2 class="section-title">Our <span>Services</span></h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-plane"></i>
-                    </div>
-                    <h3>Flight Booking</h3>
-                    <p>We find the best flight deals for your destination with flexible options.</p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-hotel"></i>
-                    </div>
-                    <h3>Hotel Reservations</h3>
-                    <p>From luxury resorts to budget stays, we have the perfect accommodation for you.</p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-route"></i>
-                    </div>
-                    <h3>Custom Itineraries</h3>
-                    <p>Tailor-made travel plans designed specifically for your preferences.</p>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <h3>Transportation</h3>
-                    <p>Airport transfers, rental cars, and private drivers for seamless travel.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <!-- App Code: Matching Pairs Game (JSX) -->
+    <script type="text/babel">
+      const { useEffect, useMemo, useRef, useState } = React;
 
-    <!-- Testimonials Section -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <h2 class="section-title">What Our <span>Clients Say</span></h2>
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Wanderlust Adventures planned the perfect honeymoon for us. Every detail was taken care of, and we could just focus on enjoying our time together."</p>
-                    <div class="testimonial-author">
-                        <div class="author-img">
-                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah Johnson">
-                        </div>
-                        <div class="author-info">
-                            <h4>Sarah Johnson</h4>
-                            <p>Honeymoon in Bali</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"The cultural tour of Japan was exceptional. Our guide was knowledgeable, and the accommodations were top-notch. Will definitely use them again!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-img">
-                            <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="Michael Chen">
-                        </div>
-                        <div class="author-info">
-                            <h4>Michael Chen</h4>
-                            <p>Japan Cultural Tour</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"I've never experienced such personalized service. They really listened to what I wanted and created a Greek island hopping trip that exceeded my expectations."</p>
-                    <div class="testimonial-author">
-                        <div class="author-img">
-                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Emily Rodriguez">
-                        </div>
-                        <div class="author-info">
-                            <h4>Emily Rodriguez</h4>
-                            <p>Greek Islands Tour</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+      /**
+       * JSON Schema for pairs (array):
+       * [
+       *   { id: "unique-pair-id", label: "Text to show", image?: "https://...", bg?: "#hex or css color" }
+       * ]
+       * Each object represents ONE pair; the game duplicates it into two cards.
+       */
 
-    <!-- Newsletter Section -->
-    <section class="newsletter">
-        <div class="container">
-            <h2>Subscribe to Our Newsletter</h2>
-            <p>Stay updated with our latest offers, travel tips, and destination guides.</p>
-            <form class="newsletter-form">
-                <input type="email" placeholder="Enter your email address" required>
-                <button type="submit">Subscribe</button>
-            </form>
-        </div>
-    </section>
+      // --- Mock data (replace later) ---
+      const DEFAULT_PAIRS = [
+        { id: "p1", label: "Apple", bg: "#fde68a" },
+        { id: "p2", label: "Banana", bg: "#fef3c7" },
+        { id: "p3", label: "Cherry", bg: "#fecaca" },
+        { id: "p4", label: "Grape", bg: "#e9d5ff" },
+        { id: "p5", label: "Lemon", bg: "#fef08a" },
+        { id: "p6", label: "Mango", bg: "#ffedd5" }
+      ];
 
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Wanderlust Adventures</h3>
-                    <p>Making your travel dreams come true with personalized service and attention to detail.</p>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-pinterest"></i></a>
-                    </div>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul class="footer-links">
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#destinations">Destinations</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="#testimonials">Testimonials</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Popular Destinations</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Bali, Indonesia</a></li>
-                        <li><a href="#">Santorini, Greece</a></li>
-                        <li><a href="#">Kyoto, Japan</a></li>
-                        <li><a href="#">Paris, France</a></li>
-                        <li><a href="#">Maldives</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-column">
-                    <h3>Contact Info</h3>
-                    <ul class="footer-links">
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Travel Street, Tourism City</li>
-                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                        <li><i class="fas fa-envelope"></i> info@wanderlustadventures.com</li>
-                        <li><i class="fas fa-clock"></i> Mon-Fri: 9am - 6pm</li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="copyright">
-                <p>&copy; 2023 Wanderlust Adventures. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+      // --- Utilities ---
+      function shuffle(array) {
+        const a = array.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
 
-    <script>
-        // Sticky Header
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.classList.add('sticky');
-            } else {
-                header.classList.remove('sticky');
-            }
-        });
-        
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
-        
-        menuToggle.addEventListener('click', function() {
-            navLinks.classList.toggle('active');
-        });
-        
-        // Close mobile menu when clicking on a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
+      function safeParse(jsonStr) {
+        try {
+          const data = JSON.parse(jsonStr);
+          if (!Array.isArray(data)) throw new Error("Root must be an array of pairs");
+          return { ok: true, data };
+        } catch (e) {
+          return { ok: false, error: e.message };
+        }
+      }
+
+      function useTimer(isRunning) {
+        const [elapsed, setElapsed] = useState(0);
+        const startRef = useRef(null);
+
+        useEffect(() => {
+          let rafId;
+          if (isRunning) {
+            if (startRef.current == null) startRef.current = performance.now();
+            const tick = () => {
+              setElapsed((performance.now() - startRef.current) / 1000);
+              rafId = requestAnimationFrame(tick);
+            };
+            rafId = requestAnimationFrame(tick);
+          }
+          return () => cancelAnimationFrame(rafId);
+        }, [isRunning]);
+
+        const reset = () => {
+          startRef.current = performance.now();
+          setElapsed(0);
+        };
+
+        return { elapsed, reset };
+      }
+
+      function MatchingPairsGame() {
+        // JSON editor state
+        const [jsonText, setJsonText] = useState(
+          () => localStorage.getItem("pairs-json") || JSON.stringify(DEFAULT_P A I R S, null, 2)
+        );
+        const parsed = useMemo(() => safeParse(jsonText), [jsonText]);
+
+        // Build a deck from the parsed pairs
+        const buildDeck = (pairs) => {
+          const cards = [];
+          pairs.forEach((p, idx) => {
+            const pairId = p.id ?? `pair-${idx}`;
+            const base = { pairId, label: p.label ?? `Item ${idx + 1}`, image: p.image, bg: p.bg };
+            cards.push({ ...base, uid: `${pairId}-a`, state: "faceDown" });
+            cards.push({ ...base, uid: `${pairId}-b`, state: "faceDown" });
+          });
+          return shuffle(cards);
+        };
+
+        const [deck, setDeck] = useState(() => buildDeck(parsed.ok ? parsed.data : DEFAULT_PAIRS));
+        const [first, setFirst] = useState(null);
+        const [second, setSecond] = useState(null);
+        const [lock, setLock] = useState(false);
+        const [moves, setMoves] = useState(0);
+        const [matches, setMatches] = useState(0);
+
+        const allMatched = matches > 0 && matches * 2 === deck.length;
+        const isRunning = deck.some((c) => c.state !== "matched");
+        const { elapsed, reset: resetTimer } = useTimer(isRunning);
+
+        // Persist JSON changes
+        useEffect(() => {
+          localStorage.setItem("pairs-json", jsonText);
+        }, [jsonText]);
+
+        // Reset game when JSON changes (and is valid)
+        useEffect(() => {
+          if (parsed.ok) {
+            setDeck(buildDeck(parsed.data));
+            setFirst(null);
+            setSecond(null);
+            setLock(false);
+            setMoves(0);
+            setMatches(0);
+            resetTimer();
+          }
+        }, [parsed.ok, jsonText]);
+
+        // Handle card selection
+        const onFlip = (uid) => {
+          if (lock) return;
+          const card = deck.find((c) => c.uid === uid);
+          if (!card || card.state !== "faceDown") return;
+
+          const nextDeck = deck.map((c) => (c.uid === uid ? { ...c, state: "faceUp" } : c));
+          setDeck(nextDeck);
+
+          if (!first) {
+            setFirst({ ...card, state: "faceUp" });
+            return;
+          }
+
+          if (first.uid === uid) return; // same card safeguard
+
+          setSecond({ ...card, state: "faceUp" });
+          setLock(true);
+          setMoves((m) => m + 1);
+
+          // Evaluate after a short delay for UX
+          setTimeout(() => {
+            setDeck((curr) => {
+              const a = curr.find((c) => c.uid === first.uid);
+              const b = curr.find((c) => c.uid === uid);
+              if (!a || !b) return curr;
+              if (a.pairId === b.pairId) {
+                setMatches((mm) => mm + 1);
+                return curr.map((c) => (c.uid === a.uid || c.uid === b.uid ? { ...c, state: "matched" } : c));
+              } else {
+                return curr.map((c) => (c.uid === a.uid || c.uid === b.uid ? { ...c, state: "faceDown" } : c));
+              }
             });
-        });
-        
-        // Simple form validation for newsletter
-        document.querySelector('.newsletter-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input').value;
-            if (email) {
-                alert('Thank you for subscribing to our newsletter!');
-                this.querySelector('input').value = '';
-            }
-        });
+            setFirst(null);
+            setSecond(null);
+            setLock(false);
+          }, 650);
+        };
+
+        const resetGame = () => {
+          if (!parsed.ok) return;
+          setDeck(buildDeck(parsed.data));
+          setFirst(null);
+          setSecond(null);
+          setLock(false);
+          setMoves(0);
+          setMatches(0);
+          resetTimer();
+        };
+
+        const copyJson = async () => {
+          try {
+            await navigator.clipboard.writeText(jsonText);
+          } catch (e) {
+            console.warn("Clipboard failed:", e);
+          }
+        };
+
+        const gridRef = useRef(null);
+
+        const cardSizeClass = useMemo(() => {
+          const n = deck.length;
+          if (n <= 8) return "grid-cols-4";
+          if (n <= 12) return "grid-cols-4";
+          if (n <= 16) return "grid-cols-4";
+          if (n <= 20) return "grid-cols-5";
+          return "grid-cols-6";
+        }, [deck.length]);
+
+        return (
+          <div className="min-h-screen bg-neutral-100 text-neutral-900">
+            {/* Header */}
+            <header className="mx-auto max-w-6xl px-4 pt-8 pb-4">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <h1 className="text-2xl font-bold tracking-tight">Matching Pairs</h1>
+                <div className="flex flex-wrap items-center gap-2">
+                  <button onClick={resetGame} className="rounded-2xl border border-neutral-300 px-4 py-2 text-sm shadow-sm hover:bg-white active:scale-[.98]" title="Reset & Shuffle">Reset & Shuffle</button>
+                  <button onClick={copyJson} className="rounded-2xl border border-neutral-300 px-4 py-2 text-sm shadow-sm hover:bg-white active:scale-[.98]" title="Copy JSON to clipboard">Copy JSON</button>
+                </div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-3 gap-3 text-sm">
+                <div className="rounded-xl bg-white p-3 shadow-sm">
+                  <div className="font-semibold">Moves</div>
+                  <div className="text-2xl tabular-nums">{moves}</div>
+                </div>
+                <div className="rounded-xl bg-white p-3 shadow-sm">
+                  <div className="font-semibold">Matches</div>
+                  <div className="text-2xl tabular-nums">{matches} / {deck.length / 2}</div>
+                </div>
+                <div className="rounded-xl bg-white p-3 shadow-sm">
+                  <div className="font-semibold">Time</div>
+                  <div className="text-2xl tabular-nums">{elapsed.toFixed(1)}s</div>
+                </div>
+              </div>
+            </header>
+
+            {/* Main content */}
+            <main className="mx-auto grid max-w-6xl grid-cols-1 gap-6 px-4 pb-12 md:grid-cols-3">
+              {/* Game board */}
+              <section className="md:col-span-2">
+                <div className={`grid ${cardSizeClass} gap-3`} role="grid" aria-label="Game board">
+                  {deck.map((card, idx) => (
+                    <Card key={card.uid} card={card} index={idx} onFlip={onFlip} />
+                  ))}
+                </div>
+                {allMatched && (
+                  <div className="mt-6 rounded-xl bg-emerald-50 p-4 text-emerald-900 shadow-sm">
+                    <div className="text-lg font-semibold">🎉 You matched them all!</div>
+                    <div className="text-sm">Moves: {moves} · Time: {elapsed.toFixed(1)}s</div>
+                  </div>
+                )}
+              </section>
+
+              {/* JSON editor */}
+              <aside className="md:col-span-1">
+                <div className="sticky top-4 rounded-xl bg-white p-4 shadow-sm">
+                  <div className="mb-2 flex items-center justify-between">
+                    <h2 className="text-base font-semibold">Edit Data (JSON)</h2>
+                    <span className={`text-xs ${parsed.ok ? "text-emerald-600" : "text-red-600"}`}>
+                      {parsed.ok ? "Valid" : `Invalid: ${parsed.error}`}
+                    </span>
+                  </div>
+                  <textarea
+                    value={jsonText}
+                    onChange={(e) => setJsonText(e.target.value)}
+                    className="h-72 w-full resize-y rounded-lg border border-neutral-300 bg-neutral-50 p-2 font-mono text-xs outline-none focus:ring-2 focus:ring-neutral-300"
+                    spellCheck={false}
+                    aria-label="Pairs JSON editor"
+                  />
+                  <div className="mt-3 space-y-2 text-xs text-neutral-600">
+                    <p>
+                      Tip: Provide an array of pairs. Each pair becomes two cards. You can add
+                      <code className="mx-1 rounded bg-neutral-100 px-1">image</code> and
+                      <code className="mx-1 rounded bg-neutral-100 px-1">bg</code>.
+                    </p>
+                    <details>
+                      <summary className="cursor-pointer select-none font-medium">Minimal example</summary>
+                      <pre className="mt-2 overflow-auto rounded-lg bg-neutral-100 p-2">{`[
+  { "id": "p1", "label": "Dog" },
+  { "id": "p2", "label": "Cat" }
+]`}</pre>
+                    </details>
+                    <details>
+                      <summary className="cursor-pointer select-none font-medium">With images</summary>
+                      <pre className="mt-2 overflow-auto rounded-lg bg-neutral-100 p-2">{`[
+  { "id": "p1", "label": "Apple", "image": "https://picsum.photos/seed/apple/200" },
+  { "id": "p2", "label": "Banana", "image": "https://picsum.photos/seed/banana/200" }
+]`}</pre>
+                    </details>
+                    <button onClick={resetGame} className="mt-2 w-full rounded-xl border border-neutral-300 px-3 py-2 text-sm hover:bg-neutral-50">Reset & Shuffle</button>
+                  </div>
+                </div>
+              </aside>
+            </main>
+
+            <footer className="mx-auto max-w-6xl px-4 pb-10 text-center text-xs text-neutral-500">
+              Built with React + Tailwind. Paste your own JSON, and press Reset.
+            </footer>
+          </div>
+        );
+      }
+
+      function Card({ card, onFlip, index }) {
+        const isUp = card.state === "faceUp" || card.state === "matched";
+        const isMatched = card.state === "matched";
+
+        return (
+          <button
+            onClick={() => onFlip(card.uid)}
+            disabled={isMatched}
+            className={`relative aspect-square w-full select-none rounded-2xl border border-neutral-300 shadow-sm transition-transform active:scale-[.98] ${isMatched ? "opacity-70" : ""}`}
+            aria-label={`Card ${index + 1}`}
+            aria-pressed={isUp}
+            style={{ perspective: "1000px", background: isUp ? (card.bg || "#ffffff") : "#f3f4f6" }}
+          >
+            <div
+              className={`absolute inset-0 flex h-full w-full items-center justify-center p-3 transition-all duration-300 ${isUp ? "rotate-0" : "rotate-y-180"}`}
+              style={{ transformStyle: "preserve-3d" }}
+            >
+              {/* Front (face-up) */}
+              <div className={`absolute inset-0 flex items-center justify-center backface-hidden p-2 ${isUp ? "opacity-100" : "opacity-0"}`} style={{ transform: "rotateY(0deg)" }}>
+                {card.image ? (
+                  <figure className="flex flex-col items-center gap-2">
+                    <img src={card.image} alt={card.label || "Pair image"} className="max-h-24 w-auto rounded-lg object-contain" />
+                    {card.label && <figcaption className="text-xs font-medium text-neutral-800">{card.label}</figcaption>}
+                  </figure>
+                ) : (
+                  <span className="text-lg font-semibold text-neutral-900">{card.label}</span>
+                )}
+              </div>
+
+              {/* Back (face-down) */}
+              <div className={`absolute inset-0 flex items-center justify-center rounded-2xl bg-neutral-200 backface-hidden ${isUp ? "opacity-0" : "opacity-100"}`} style={{ transform: "rotateY(180deg)" }}>
+                <span className="text-2xl">❓</span>
+              </div>
+            </div>
+          </button>
+        );
+      }
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<MatchingPairsGame />);
     </script>
-</body>
+  </body>
 </html>
